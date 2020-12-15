@@ -1,0 +1,110 @@
+<link rel="import" href="../polymer/polymer-element.html">
+<link rel="import" href="../iron-ajax/iron-ajax.html">
+<link rel="import" href="../iron-collapse/iron-collapse.html">
+<link rel="import" href="../paper-card/paper-card.html">
+
+<dom-module id="ejemplo-iron-ajax">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+
+      .wrapper-cards{
+        display: inline-flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: flex-start;
+      }
+      .wrapper-cards > .card{
+        width: 40%;
+        margin: .25rem;
+      }
+
+      .card {
+        cursor: pointer;
+      }
+
+      .card__header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1rem;
+      }
+
+      .card__header-title {
+        font-size: 1.1rem;
+        font-weight: 500;
+      }
+
+      .card__header-img {
+        display: inline-block;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        overflow: hidden;
+      }
+
+      .card__body {}
+
+      .card__body-friend{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding:.125rem;
+      }
+    </style>
+    <iron-ajax auto url="http://demo6292426.mockable.io/persons" handle-as="json" last-response="{{persons}}">
+    </iron-ajax>
+    <div class="wrapper-cards">
+      <template is="dom-repeat" items="{{persons}}" as="person">
+        <paper-card class="card">
+          <div class="card__header" on-click="toggle">
+            <h2 class="card__header-title">{{person.name.first}} {{person.name.last}}</h2>
+            <div class="card__header-img"><img src="{{person.picture}}" alt="Imagen persona"></div>
+          </div>
+          <div class="card__body">
+            <iron-collapse id="collapse{{index}}">
+              <div class="card__body-friends">
+                <template is="dom-repeat" items="{{person.friends}}" as="friend">
+                  <div class="card__body-friend">
+                      <label>{{friend.name}}</label>
+                  </div>
+                </template>
+              </div>
+            </iron-collapse>
+          </div>
+        </paper-card>
+      </template>
+    </div>
+
+  </template>
+
+  <script>
+    /**
+     * `ejemplo-iron-ajax`
+     * 
+     *
+     * @customElement
+     * @polymer
+     * @demo demo/index.html
+     */
+    class EjemploIronAjax extends Polymer.Element {
+      static get is() { return 'ejemplo-iron-ajax'; }
+      static get properties() {
+
+        return {
+          persons: {
+            type: Array
+          }
+        };
+      }
+      toggle(e) {
+        let ironCollapse = this.shadowRoot.querySelector(`#collapse${e.model.index}`);
+        ironCollapse.toggle();
+      }
+    }
+
+    window.customElements.define(EjemploIronAjax.is, EjemploIronAjax);
+  </script>
+</dom-module>
