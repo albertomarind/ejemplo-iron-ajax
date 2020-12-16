@@ -6,16 +6,12 @@
 <link rel="import" href="../iron-icons/image-icons.html">
 <link rel="import" href="../iron-icons/editor-icons.html">
 
-
 <link rel="import" href="../paper-item/paper-item.html">
 <link rel="import" href="../paper-item/paper-item-body.html">
 <link rel="import" href="../paper-item/paper-icon-item.html">
 
 <link rel="import" href="../paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../paper-button/paper-button.html">
-<link rel="import" href="leaflet-map.html">
-
-
 
 
 <dom-module id="ejemplo-iron-ajax">
@@ -104,12 +100,17 @@
         border-left: 6px solid #4fb96e;
       }
 
+      .card__body-friends {
+        margin: 1rem 0;
+      }
+
 
       .card__body-btn-friends {
         display: flex;
         justify-content: flex-end;
         align-items: center;
         padding: .5rem 1rem;
+
 
       }
 
@@ -148,6 +149,11 @@
 
       paper-button[active] {
         background-color: #2d7442;
+      }
+
+      [id*='mapita'] {
+        width: 100%;
+        height: 300px;
       }
     </style>
     <iron-ajax auto url="http://demo6292426.mockable.io/persons" handle-as="json" on-response="handleResponse"">
@@ -210,7 +216,9 @@
             </iron-collapse>
 
             <iron-collapse opened="{{person.showLocation}}">
-              <leaflet-map latitude="{{person.latitude}}" longitude="{{person.longitude}}" id="map{{index}}"></leaflet-map>
+              <!-- <leaflet-map latitude="{{person.latitude}}" longitude="{{person.longitude}}" id="map{{index}}">
+              </leaflet-map> -->
+              <div id="mapita{{index}}"></div>
             </iron-collapse>
           </div>
         </paper-card>
@@ -254,6 +262,21 @@
 
       toggleLocation(e) {
         e.model.set('person.showLocation', !e.model.person.showLocation);
+        this.handlePersonLocation(e.model);
+      }
+      handlePersonLocation(model) {
+        if (!model.person.map) {
+          let refHtmlMap = this.shadowRoot.querySelector('#mapita' + model.index);
+          let map = L.map(refHtmlMap).setView([model.person.latitude, model.person.longitude], 13);
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          }).addTo(map);
+          L.marker([model.person.latitude, model.person.longitude]).addTo(map);
+          model.set('person.map', map);
+        } else {
+          model.person.map.remove();
+          model.set('person.map', null);
+        }
       }
 
       handleResponse(e, ironRequest) {
