@@ -1,0 +1,67 @@
+<link rel="import" href="../polymer/polymer-element.html">
+
+<dom-module id="leaflet-map">
+  <template>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+      integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+      crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+      integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+      crossorigin=""></script>
+
+    <style>
+      :host {
+        display: inline-block;
+        width: 100%;
+      }
+
+      .wrapper-map {
+        height: var(--map-height, 400px);
+      }
+    </style>
+    <div id="map" class="wrapper-map"></div>
+
+  </template>
+
+  <script>
+    /**
+     * `ejemplo-iron-ajax`
+     * 
+     *
+     * @customElement
+     * @polymer
+     * @demo demo/index.html
+     */
+    class LeafletMap extends Polymer.Element {
+      static get is() { return 'leaflet-map'; }
+      static get properties() {
+        return {
+          map: Object,
+          latitude: Number,
+          longitude: Number,
+        };
+      }
+      connectedCallback() {
+        super.connectedCallback();
+        this.loadMap();
+      }
+      disconnectedCallback() {
+        super.disconnectedCallback();
+        this.map.remove();
+      }
+
+      loadMap() {
+        let refHtmlMap = this.shadowRoot.querySelector('#map');
+        let map = L.map(refHtmlMap).setView([this.latitude, this.longitude], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+        L.marker([this.latitude, this.longitude]).addTo(map);
+        this.set('map', map);
+      }
+
+    }
+
+    window.customElements.define(LeafletMap.is, LeafletMap);
+  </script>
+</dom-module>
