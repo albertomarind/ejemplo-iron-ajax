@@ -254,15 +254,6 @@
 
       toggleLocation(e) {
         e.model.set('person.showLocation', !e.model.person.showLocation);
-        //this.initMap(e);
-      }
-
-      initMap(e) {
-        let leafletMap = this.shadowRoot.querySelector(`#map${e.model.index}`);
-        let { latitude, longitude } = e.model.person;
-        leafletMap.setCenter(latitude, longitude);
-        leafletMap.setZoom(13);
-        leafletMap.addMarker(latitude, longitude);
       }
 
       handleResponse(e, ironRequest) {
