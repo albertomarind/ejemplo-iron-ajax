@@ -4,11 +4,29 @@
 <link rel="import" href="../paper-card/paper-card.html">
 <link rel="import" href="../iron-icons/iron-icons.html">
 <link rel="import" href="../iron-icons/image-icons.html">
+<link rel="import" href="../iron-icons/editor-icons.html">
+
+
+<link rel="import" href="../paper-item/paper-item.html">
+<link rel="import" href="../paper-item/paper-item-body.html">
+<link rel="import" href="../paper-item/paper-icon-item.html">
+
 <link rel="import" href="../paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../paper-button/paper-button.html">
+<link rel="import" href="leaflet-map.html">
+
+
+
 
 <dom-module id="ejemplo-iron-ajax">
   <template>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+      integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+      crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+      integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+      crossorigin=""></script>
+
     <style>
       :host {
         display: block;
@@ -22,11 +40,10 @@
       }
 
       .wrapper-cards>.card {
-        width: 40%;
+        width: 100%;
         margin: .25rem;
       }
 
-      .card {}
 
       .card__header {
         position: relative;
@@ -34,42 +51,43 @@
         align-items: center;
         justify-content: space-between;
         padding: 1rem .75rem .125rem .75rem;
+
+      }
+
+      .card__header::after {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        content: '';
+        width: 100%;
+        height: 65%;
+        background-color: #cc3936b0;
+      }
+
+      .card.active .card__header::after {
+        background-color: #4fb96e;
       }
 
       .card__header-title {
-        font-size: 1.1rem;
-        font-weight: 500;
+        font-size: 1.8rem;
+        letter-spacing: .125rem;
+        font-weight: 400;
+        color: white;
+        z-index: 1;
+        transform: translate(-10%, -15%);
       }
-
-      .card__header-eye-color {
-        opacity: .5;
-        position: absolute;
-        top: -2.5px;
-        right: -5px;
-      }
-
-      .card__header-eye-color.brown {
-        color: brown;
-      }
-
-      .card__header-eye-color.blue {
-        color: blue;
-      }
-
-      .card__header-eye-color.green {
-        color: green;
-      }
-
 
       .card__header-img {
         display: inline-block;
-        width: 32px;
-        height: 32px;
+        width: 100px;
+        height: 100px;
         border-radius: 50%;
-        border: 1px solid #a0a0a0;
+        border: 5px solid white;
         overflow: hidden;
-        transform: scale(1.3);
-        margin-right: 1rem;
+        z-index: 1;
+        transform: translate(15%, 15%);
       }
 
       .card__body {
@@ -83,65 +101,113 @@
         padding: .25rem;
         border: 1px solid #d2d2d2;
         margin-top: .5rem;
+        border-left: 6px solid #4fb96e;
       }
+
 
       .card__body-btn-friends {
         display: flex;
         justify-content: flex-end;
         align-items: center;
+        padding: .5rem 1rem;
+
       }
 
-      .card__body-details-balance > label,
-      .card__body-details-fruit > label{
-        font-weight: 700;
+      .card__body-details {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-gap: .125rem;
       }
 
-
-      paper-button {
-        --paper-button: {
-          padding: .5rem .25;
-          font-size: .75rem;
+      paper-icon-item.card-detail-item {
+        --paper-icon-item: {
+          display: flex;
+          justify-content: center;
+          align-items: center;
         }
 
         ;
       }
 
-      paper-button.indigo {
-        background-color: var(--paper-indigo-500);
+      paper-button {
+        --paper-button: {
+          display: inline-block;
+          font-size: 1rem;
+          text-transform: capitalize;
+          text-align: center;
+          padding: .125rem .125rem;
+        }
+
+        ;
+      }
+
+      paper-button {
+        background-color: #4fb96e;
         color: white;
       }
 
-      paper-button.indigo[active] {
-        background-color: var(--paper-red-500);
+      paper-button[active] {
+        background-color: #2d7442;
+      }
+
+      iron-collapse>[id^='map'] {
+        margin-top: .25rem;
+        width: 100%;
+        display: inline-block;
+        height: 300px;
+        border: 2px solid rgb(187, 187, 187);
       }
     </style>
-    <iron-ajax auto url="http://demo6292426.mockable.io/persons" handle-as="json" last-response="{{persons}}">
+    <iron-ajax auto url="http://demo6292426.mockable.io/persons" handle-as="json" on-response="handleResponse"">
     </iron-ajax>
-    <div class="wrapper-cards">
+    <div class=" wrapper-cards">
       <template is="dom-repeat" items="{{persons}}" as="person">
-        <paper-card class="card">
+        <paper-card class$="card {{_isPersonActive(person.isActive)}}">
           <div class="card__header">
-            <paper-icon-button icon="image:remove-red-eye" class$="card__header-eye-color {{person.eyeColor}}">
-            </paper-icon-button>
-            <h2 class="card__header-title">{{person.name.first}} {{person.name.last}}</h2>
             <div class="card__header-img"><img src="{{person.picture}}" alt="Imagen persona"></div>
+            <h2 class="card__header-title">{{person.name.first}} {{person.name.last}}</h2>
           </div>
           <div class="card__body">
             <div class="card__body-details">
-              <div class="card__body-details-balance">
-                <label>Balance:</label>
-                <span>{{_darFormatoCantidad(person.balance)}}</span>
-              </div>
-              <div class="card__body-details-fruit">
-                <label>Fruta:</label>
-                <span>{{person.favoriteFruit}}</span>
-              </div>
+              <paper-icon-item class="card-detail__item">
+                <span slot="item-icon">
+                  📱
+                </span>
+                <paper-item-body two-line>
+                  <label>{{person.phone}}</label>
+                  <span secondary>Phone</span>
+                </paper-item-body>
+              </paper-icon-item>
+              <paper-icon-item class="card-detail__item">
+                <iron-icon icon="editor:attach-money" slot="item-icon">
+                </iron-icon>
+                <paper-item-body two-line>
+                  <label>{{_applyMask(person.balance)}}</label>
+                  <span secondary>Balance</span>
+                </paper-item-body>
+              </paper-icon-item>
+              <paper-icon-item class="card-detail__item">
+                <span slot="item-icon">{{_getFavoriteFruit(person.favoriteFruit)}}</span>
+                <paper-item-body two-line>
+                  <label>{{person.favoriteFruit}}</label>
+                  <span secondary>Favorite fruit</span>
+                </paper-item-body>
+              </paper-icon-item>
+              <paper-icon-item class="card-detail__item">
+                <iron-icon icon="image:remove-red-eye" slot="item-icon" style$="color:{{person.eyeColor}}">
+                </iron-icon>
+                <paper-item-body two-line>
+                  <label>{{person.eyeColor}}</label>
+                  <span secondary>Eye color</span>
+                </paper-item-body>
+              </paper-icon-item>
             </div>
             <div class="card__body-btn-friends">
-              <paper-button toggles raised class="indigo" on-click="toggle">Amigos</paper-button>
+              <paper-button toggles raised on-click="toggleFriends">Friends</paper-button>
+              <paper-button toggles raised on-click="toggleLocation">Location</paper-button>
             </div>
 
-            <iron-collapse id="collapse{{index}}">
+            <iron-collapse opened="{{person.showFriends}}">
               <div class="card__body-friends">
                 <template is="dom-repeat" items="{{person.friends}}" as="friend">
                   <div class="card__body-friend">
@@ -150,10 +216,14 @@
                 </template>
               </div>
             </iron-collapse>
+
+            <iron-collapse opened="{{person.showLocation}}">
+              <leaflet-map latitude="{{person.latitude}}" longitude="{{person.longitude}}" id="map{{index}}"></leaflet-map>
+            </iron-collapse>
           </div>
         </paper-card>
       </template>
-    </div>
+      </div>
   </template>
 
   <script>
@@ -168,21 +238,51 @@
     class EjemploIronAjax extends Polymer.Element {
       static get is() { return 'ejemplo-iron-ajax'; }
       static get properties() {
-
         return {
           persons: {
             type: Array
           }
         };
       }
-      toggle(e) {
-        let ironCollapse = this.shadowRoot.querySelector(`#collapse${e.model.index}`);
-        ironCollapse.toggle();
+      _getFavoriteFruit(favoriteFruit) {
+        switch (favoriteFruit) {
+          case 'banana': return '🍌';
+          case 'apple': return '🍎';
+          case 'strawberry': return '🍓';
+        }
       }
 
-      _darFormatoCantidad(cantidad) {
-        return cantidad.replace('$', '').replace(',', '');
+      _isPersonActive(isActive) {
+        return isActive ? 'active' : '';
       }
+
+      toggleFriends(e) {
+        e.model.set('person.showFriends', !e.model.person.showFriends);
+      }
+
+      toggleLocation(e) {
+        e.model.set('person.showLocation', !e.model.person.showLocation);
+        //this.initMap(e);
+      }
+
+      initMap(e) {
+        let leafletMap = this.shadowRoot.querySelector(`#map${e.model.index}`);
+        let { latitude, longitude } = e.model.person;
+        leafletMap.setCenter(latitude, longitude);
+        leafletMap.setZoom(13);
+        leafletMap.addMarker(latitude, longitude);
+      }
+
+      handleResponse(e, ironRequest) {
+        if (ironRequest.response) {
+          this.set('persons', ironRequest.response.map(person => ({ ...person, showFriends: false, showLocation: false })));
+        }
+      }
+
+      _applyMask(balance) {
+        return balance.replace(/[$,]/g, '');
+      }
+
     }
 
     window.customElements.define(EjemploIronAjax.is, EjemploIronAjax);
