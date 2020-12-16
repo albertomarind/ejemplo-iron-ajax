@@ -26,6 +26,9 @@
     <style>
       :host {
         display: block;
+        --color-primary: #4fb96e;
+        --color-primary-focus: #2d7442;
+        --color-secondary: #cc3936b0;
       }
 
       .wrapper-cards {
@@ -59,11 +62,11 @@
         content: '';
         width: 100%;
         height: 65%;
-        background-color: #cc3936b0;
+        background-color: var(--color-secondary);
       }
 
       .card.active .card__header::after {
-        background-color: #4fb96e;
+        background-color: var(--color-primary);
       }
 
       .card__header-title {
@@ -97,7 +100,7 @@
         padding: .25rem;
         border: 1px solid #d2d2d2;
         margin-top: .5rem;
-        border-left: 6px solid #4fb96e;
+        border-left: 6px solid var(--color-primary);
       }
 
       .card__body-friends {
@@ -143,26 +146,26 @@
       }
 
       paper-button {
-        background-color: #4fb96e;
+        background-color: var(--color-primary);
         color: white;
       }
 
       paper-button[active] {
-        background-color: #2d7442;
+        background-color: var(--color-primary-focus);
       }
 
-      [id*='mapita'] {
+      [id^='map'] {
         width: 100%;
         height: 300px;
       }
     </style>
-    <iron-ajax auto url="http://demo6292426.mockable.io/persons" handle-as="json" on-response="handleResponse"">
+    <iron-ajax auto url="http://demo6292426.mockable.io/persons" handle-as="json" on-response="handleResponse">
     </iron-ajax>
     <div class=" wrapper-cards">
       <template is="dom-repeat" items="{{persons}}" as="person">
         <paper-card class$="card {{_isPersonActive(person.isActive)}}">
           <div class="card__header">
-            <div class="card__header-img"><img src="{{person.picture}}" alt="Imagen persona"></div>
+            <div class="card__header-img"><img src="{{person.picture}}" alt="Person Picture"></div>
             <h2 class="card__header-title">{{person.name.first}} {{person.name.last}}</h2>
           </div>
           <div class="card__body">
@@ -216,9 +219,7 @@
             </iron-collapse>
 
             <iron-collapse opened="{{person.showLocation}}">
-              <!-- <leaflet-map latitude="{{person.latitude}}" longitude="{{person.longitude}}" id="map{{index}}">
-              </leaflet-map> -->
-              <div id="mapita{{index}}"></div>
+              <div id="map{{index}}"></div>
             </iron-collapse>
           </div>
         </paper-card>
@@ -266,7 +267,7 @@
       }
       handlePersonLocation(model) {
         if (!model.person.map) {
-          let refHtmlMap = this.shadowRoot.querySelector('#mapita' + model.index);
+          let refHtmlMap = this.shadowRoot.querySelector(`#map${model.index}`);
           let map = L.map(refHtmlMap).setView([model.person.latitude, model.person.longitude], 13);
           L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
