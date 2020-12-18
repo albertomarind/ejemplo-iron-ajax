@@ -13,7 +13,7 @@
 <link rel="import" href="../paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../paper-button/paper-button.html">
 <link rel="import" href="../paper-dialog/paper-dialog.html">
-
+<link rel="import" href="./mi-intento-de-dialog.html">
 
 
 <dom-module id="ejemplo-iron-ajax">
@@ -161,14 +161,18 @@
         height: 300px;
       }
 
-      paper-dialog paper-button{
+      paper-dialog paper-button,
+      mi-intento-de-dialog paper-button {
         border-radius: .3rem;
-        padding:.25rem .75rem;
+        padding: .25rem .75rem;
       }
-    </style> 
+    </style>
+    <mi-intento-de-dialog id="secondDialog" tabindex="-1" with-backdrop>
+      <paper-button on-click="showExampleFromMixin">Ver ejemplo</paper-button>
+    </mi-intento-de-dialog>
     <paper-dialog id="firstDialog" modal>
       <paper-button on-click="showExample">Ver ejemplo</paper-button>
-      <paper-button on-click="showMixin">Ver mi intento de uso de mixin</paper-button>
+      <paper-button on-click="openSecondDialog">Ver mi intento de uso de mixin</paper-button>
     </paper-dialog>
     <iron-ajax id="ironAjax" url="http://demo6292426.mockable.io/persons" handle-as="json" on-response="handleResponse">
     </iron-ajax>
@@ -261,23 +265,43 @@
         };
       }
 
-      connectedCallback(){
+      connectedCallback() {
         super.connectedCallback();
         this.openFirstDialog();
       }
 
-      showExample(){
-        this.closeFirstDialog();
+      loadData() {
         let ironAjax = this.shadowRoot.querySelector('#ironAjax');
         ironAjax.generateRequest();
       }
 
-      closeFirstDialog(){
+      openSecondDialog() {
+        let secondDialog = this.shadowRoot.querySelector('#secondDialog');
+        secondDialog.open();
+      }
+
+      closeSecondDialog() {
+        let secondDialog = this.shadowRoot.querySelector('#secondDialog');
+        secondDialog.close();
+      }
+
+      showExample() {
+        this.closeFirstDialog();
+        this.loadData();
+      }
+      
+      showExampleFromMixin() {
+        this.closeFirstDialog();
+        this.closeSecondDialog();
+        this.loadData();
+      }
+
+      closeFirstDialog() {
         let firstDialog = this.shadowRoot.querySelector('#firstDialog');
         firstDialog.close();
       }
 
-      openFirstDialog(){
+      openFirstDialog() {
         let firstDialog = this.shadowRoot.querySelector('#firstDialog');
         firstDialog.open();
       }

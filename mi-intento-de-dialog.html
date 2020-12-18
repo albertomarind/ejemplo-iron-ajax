@@ -1,0 +1,38 @@
+<link rel="import" href="../polymer/polymer-element.html">
+<link rel="import" href="../iron-overlay-behavior/iron-overlay-behavior.html">
+<!-- <link rel="import" href="./mixin-dialog.html"> -->
+
+
+<dom-module id="mi-intento-de-dialog">
+  <template>
+    <style>
+      :host {
+        display: block;
+        background: white;
+        color: black;
+        padding: 24px;
+        box-shadow: rgba(0, 0, 0, 0.24) -2px 5px 12px 0px, rgba(0, 0, 0, 0.12) 0px 0px 12px 0px;
+      }
+    </style>
+    <slot></slot>
+  </template>
+  <script>
+
+    class MiIntentoDeDialog extends Polymer.mixinBehaviors([Polymer.IronOverlayBehavior], Polymer.Element) {
+
+      static get is() {
+        return 'mi-intento-de-dialog';
+      }
+
+      static get properties() {
+        return {
+          persons: {
+            type: Array
+          }
+        };
+      }
+    }
+
+    window.customElements.define(MiIntentoDeDialog.is, MiIntentoDeDialog);
+  </script>
+</dom-module>
