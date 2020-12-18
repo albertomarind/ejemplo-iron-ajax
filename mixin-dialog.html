@@ -1,0 +1,36 @@
+<link rel="import" href="../polymer/polymer-element.html">
+
+<dom-module id="mixin-dialog">
+  <template>
+
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+  </template>
+
+  <script>
+    /**
+     * `ejemplo-iron-ajax`
+     * 
+     *
+     * @customElement
+     * @polymer
+     * @demo demo/index.html
+     */
+    Mixins.MixinDialog = Polymer.dedupingMixin((superClass) => class extends superClass {
+      static get is() {
+        return 'mixin-dialog';
+      }
+
+      static get properties() {
+        return {
+
+        };
+      }
+    })
+    
+  </script>
+</dom-module>

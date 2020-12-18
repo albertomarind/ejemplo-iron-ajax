@@ -13,8 +13,8 @@
   <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
   <link rel="import" href="../ejemplo-iron-ajax.html">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
-  integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
-  crossorigin="" />
+    integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+    crossorigin="" />
 
   <custom-style>
     <style is="custom-style" include="demo-pages-shared-styles">
@@ -25,6 +25,9 @@
 <body>
   <div class="vertical-section-container centered">
     <h3>Basic ejemplo-iron-ajax demo</h3>
+    <script>
+        window.Mixins = window.Mixins | {};
+    </script>
     <demo-snippet>
       <template>
         <ejemplo-iron-ajax></ejemplo-iron-ajax>

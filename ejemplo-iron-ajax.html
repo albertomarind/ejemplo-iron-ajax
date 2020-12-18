@@ -12,6 +12,8 @@
 
 <link rel="import" href="../paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../paper-button/paper-button.html">
+<link rel="import" href="../paper-dialog/paper-dialog.html">
+
 
 
 <dom-module id="ejemplo-iron-ajax">
@@ -158,10 +160,19 @@
         width: 100%;
         height: 300px;
       }
-    </style>
-    <iron-ajax auto url="http://demo6292426.mockable.io/persons" handle-as="json" on-response="handleResponse">
+
+      paper-dialog paper-button{
+        border-radius: .3rem;
+        padding:.25rem .75rem;
+      }
+    </style> 
+    <paper-dialog id="firstDialog" modal>
+      <paper-button on-click="showExample">Ver ejemplo</paper-button>
+      <paper-button on-click="showMixin">Ver mi intento de uso de mixin</paper-button>
+    </paper-dialog>
+    <iron-ajax id="ironAjax" url="http://demo6292426.mockable.io/persons" handle-as="json" on-response="handleResponse">
     </iron-ajax>
-    <div class=" wrapper-cards">
+    <div class="wrapper-cards">
       <template is="dom-repeat" items="{{persons}}" as="person">
         <paper-card class$="card {{_isPersonActive(person.isActive)}}">
           <div class="card__header">
@@ -224,7 +235,7 @@
           </div>
         </paper-card>
       </template>
-      </div>
+    </div>
   </template>
 
   <script>
@@ -237,7 +248,11 @@
      * @demo demo/index.html
      */
     class EjemploIronAjax extends Polymer.Element {
-      static get is() { return 'ejemplo-iron-ajax'; }
+
+      static get is() {
+        return 'ejemplo-iron-ajax';
+      }
+
       static get properties() {
         return {
           persons: {
@@ -245,11 +260,36 @@
           }
         };
       }
+
+      connectedCallback(){
+        super.connectedCallback();
+        this.openFirstDialog();
+      }
+
+      showExample(){
+        this.closeFirstDialog();
+        let ironAjax = this.shadowRoot.querySelector('#ironAjax');
+        ironAjax.generateRequest();
+      }
+
+      closeFirstDialog(){
+        let firstDialog = this.shadowRoot.querySelector('#firstDialog');
+        firstDialog.close();
+      }
+
+      openFirstDialog(){
+        let firstDialog = this.shadowRoot.querySelector('#firstDialog');
+        firstDialog.open();
+      }
+
       _getFavoriteFruit(favoriteFruit) {
         switch (favoriteFruit) {
-          case 'banana': return '🍌';
-          case 'apple': return '🍎';
-          case 'strawberry': return '🍓';
+          case 'banana':
+            return '🍌';
+          case 'apple':
+            return '🍎';
+          case 'strawberry':
+            return '🍓';
         }
       }
 
@@ -265,6 +305,7 @@
         e.model.set('person.showLocation', !e.model.person.showLocation);
         this.handlePersonLocation(e.model);
       }
+
       handlePersonLocation(model) {
         if (!model.person.map) {
           let refHtmlMap = this.shadowRoot.querySelector(`#map${model.index}`);
@@ -282,7 +323,11 @@
 
       handleResponse(e, ironRequest) {
         if (ironRequest.response) {
-          this.set('persons', ironRequest.response.map(person => ({ ...person, showFriends: false, showLocation: false })));
+          this.set('persons', ironRequest.response.map(person => ({
+            ...person,
+            showFriends: false,
+            showLocation: false
+          })));
         }
       }
 
