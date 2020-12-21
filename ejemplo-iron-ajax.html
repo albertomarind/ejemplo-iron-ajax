@@ -170,14 +170,22 @@
         padding: .25rem .75rem;
       }
 
-      .wrapper-spinner{
+      .wrapper-spinner {
         display: flex;
         justify-content: center;
         align-items: center;
       }
     </style>
     <mi-intento-de-dialog id="secondDialog" tabindex="-1" with-backdrop>
-      <paper-button on-click="showExampleFromMixin">Ver ejemplo</paper-button>
+      <select slot="header">
+        <option value="">1</option>
+        <option value="">2</option>
+        <option value="">3</option>
+      </select>
+      <div slot="body">
+        <input type="checkbox" name="" id=""> <label>Checkbox</label>
+      </div>
+      <paper-button slot="footer" on-click="showExampleFromMixin">Ver ejemplo</paper-button>
     </mi-intento-de-dialog>
     <paper-dialog id="firstDialog" modal>
       <paper-button on-click="showExample">Ver ejemplo</paper-button>
@@ -315,8 +323,6 @@
       showExample() {
         this.closeFirstDialog();
         this.loadData();
-        console.log("1");
-        console.log("cambios cambios");
       }
 
       showExampleFromMixin() {
