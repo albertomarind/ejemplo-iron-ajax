@@ -1,6 +1,5 @@
 <link rel="import" href="../polymer/polymer-element.html">
 <link rel="import" href="../iron-overlay-behavior/iron-overlay-behavior.html">
-<!-- <link rel="import" href="./mixin-dialog.html"> -->
 
 
 <dom-module id="mi-intento-de-dialog">
@@ -13,28 +12,8 @@
         padding: 24px;
         box-shadow: rgba(0, 0, 0, 0.24) -2px 5px 12px 0px, rgba(0, 0, 0, 0.12) 0px 0px 12px 0px;
       }
-      .mi-header{
-        background-color: green;
-        padding:2rem;
-      }
-      .mi-body{
-        background-color: red;
-        padding:2rem;
-      }
-      .mi-footer{
-        background-color: indigo;
-        padding:2rem;
-      }
     </style>
-    <div class="mi-header">
-      <slot name="header"></slot>
-    </div>
-    <div class="mi-body">
-      <slot name="body"></slot>
-    </div>
-    <div class="mi-footer">
-      <slot name="footer"></slot>
-    </div>
+    <slot></slot>
   </template>
   <script>
     class MiIntentoDeDialog extends Polymer.mixinBehaviors([Polymer.IronOverlayBehavior], Polymer.Element) {
