@@ -22,13 +22,86 @@
   </test-fixture>
 
   <script>
-    suite('ejemplo-iron-ajax', () => {
+    suite('ejemplo-iron-ajax', function () {
       var element;
+      var ajax;
+      var request;
+      var server;
+      var responseHeaders = {
+        json: {
+          'Content-Type': 'application/json'
+        }
+      };
+     
       setup(function () {
         element = fixture('element');
+        ajax = element.shadowRoot.querySelector('#ironAjax');
+        server = sinon.fakeServer.create();
+        server.respondWith(
+          'GET',
+          /http:\/\/demo6292426.mockable.io\/persons/, [
+            200,
+            responseHeaders.json,
+            `[
+               {
+                  "_id": "5fd8f9fddd01a8053fa72149",
+                  "index": 0,
+                  "guid": "7ec0df9f-f992-4e76-b2ef-c9e4f3364c73",
+                  "isActive": true,
+                  "balance": "$1,113.78",
+                  "picture": "https://picsum.photos/200/486",
+                  "age": 20,
+                  "eyeColor": "blue",
+                  "name": {
+                    "first": "Moon",
+                    "last": "Preston"
+                  },
+                  "company": "ENJOLA",
+                  "email": "moon.preston@enjola.name",
+                  "phone": "+1 (922) 594-2067",
+                  "address": "547 Baltic Street, Fairhaven, Mississippi, 5617",
+                  "about": "Cillum labore tempor sit occaecat pariatur eu laboris nulla sit nisi. Sunt cillum Lorem               ullamco aliquip dolor laborum commodo nisi minim aute veniam eu. Anim aute magna sint ipsum quis non in               amet elit incididunt. Deserunt ipsum sit eu esse ex.",
+                  "registered": "Thursday, October 24, 2019 5:19 PM",
+                  "latitude": "15.133526",
+                  "longitude": "173.139887",
+                  "tags": [
+                    "qui",
+                    "duis",
+                    "elit",
+                    "ut",
+                    "nostrud"
+                  ],
+                  "range": [
+                    0,
+                    1,
+                    2,
+                    3,
+                    4,
+                    5,
+                    6,
+                    7,
+                    8,
+                    9
+                  ],
+                  "friends": [
+                    {
+                      "id": 0,
+                      "name": "Lela Myers"
+                    }
+                  ],
+                  "greeting": "Hello, Moon! You have 7 unread messages.",
+                  "favoriteFruit": "banana"
+                 }
+              ]`
+          ]
+        );
       });
 
-      test('open first dialog', function (done) {
+      teardown(function () {
+        server.restore();
+      });
+      //Validar que el connectedCallback se ejecutó correctamente, aquí las acciones del usuario no estan involucradas, él no da clic para abrir el dialog
+      test('open first dialog when component load', function (done) {
         flush(function () {
           var firstDialog = element.shadowRoot.querySelector('#firstDialog');
           assert.equal(firstDialog.opened, true);
@@ -36,15 +109,22 @@
         });
       });
 
-      test('close first dialog', function (done) {
-        element.closeFirstDialog();
+      //Validar que cuando el usuario de clic se cierre el modal y se cargue la info
+      test('close first dialog and load data', function (done) {
         flush(function () {
-          var firstDialog = element.shadowRoot.querySelector('#firstDialog');
+          var firstDialog = element.shadowRoot.querySelector("#firstDialog");
+          var button = element.shadowRoot.querySelector("#buttonShowExampleFromMixin");
+          button.click();
+          request = ajax.generateRequest();
+          server.respond();
           assert.equal(firstDialog.opened, false);
+          expect(request.response).to.be.ok;
+          expect(request.response).to.be.an('array');
           done();
         });
       });
 
+      //Validar que los emojis de las frutas sean los correctos
       test('get favorite fruit', function () {
         var banana = element._getFavoriteFruit('banana');
         var apple = element._getFavoriteFruit('apple');
