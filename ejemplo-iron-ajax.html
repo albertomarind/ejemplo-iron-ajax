@@ -234,7 +234,7 @@
               </paper-icon-item>
             </div>
             <div class="card__body-btn-friends">
-              <paper-button toggles raised on-click="toggleFriends">Friends</paper-button>
+              <paper-button toggles id="idBtnToggleFriend{{index}}" raised on-click="toggleFriends">Friends</paper-button>
               <paper-button toggles raised on-click="toggleLocation">Location</paper-button>
             </div>
 
@@ -289,12 +289,6 @@
       connectedCallback() {
         super.connectedCallback();
         this.openFirstDialog();
-      }
-
-      handleLoading(e) {
-        console.log(e.detail);
-        this.set('loading', e.detail);
-        console.log(this.loading)
       }
 
       loadData() {

@@ -1,52 +1,91 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
 
-    <title>ejemplo-iron-ajax test</title>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
 
-    <script src="../../webcomponentsjs/webcomponents-loader.js"></script>
-    <script src="../../web-component-tester/browser.js"></script>
+  <title>ejemplo-iron-ajax test</title>
 
-    <link rel="import" href="../ejemplo-iron-ajax.html">
-  </head>
-  <body>
+  <script src="../../webcomponentsjs/webcomponents-loader.js"></script>
+  <script src="../../web-component-tester/browser.js"></script>
 
-    <test-fixture id="BasicTestFixture">
-      <template>
-        <ejemplo-iron-ajax></ejemplo-iron-ajax>
-      </template>
-    </test-fixture>
+  <link rel="import" href="../ejemplo-iron-ajax.html">
+</head>
 
-    <test-fixture id="ChangedPropertyTestFixture">
-      <template>
-        <ejemplo-iron-ajax prop1="new-prop1"></ejemplo-iron-ajax>
-      </template>
-    </test-fixture>
+<body>
 
-    <script>
-      suite('ejemplo-iron-ajax', () => {
+  <test-fixture id="element">
+    <template>
+      <ejemplo-iron-ajax></ejemplo-iron-ajax>
+    </template>
+  </test-fixture>
 
-        test('instantiating the element with default properties works', () => {
-          const element = fixture('BasicTestFixture');
-          assert.equal(element.prop1, 'ejemplo-iron-ajax');
-          const elementShadowRoot = element.shadowRoot;
-          const elementHeader = elementShadowRoot.querySelector('h2');
-          assert.equal(elementHeader.innerHTML, 'Hello ejemplo-iron-ajax!');
-        });
-
-        test('setting a property on the element works', () => {
-          // Create a test fixture
-          const element = fixture('ChangedPropertyTestFixture');
-          assert.equal(element.prop1, 'new-prop1');
-          const elementShadowRoot = element.shadowRoot;
-          const elementHeader = elementShadowRoot.querySelector('h2');
-          assert.equal(elementHeader.innerHTML, 'Hello new-prop1!');
-        });
-
+  <script>
+    suite('ejemplo-iron-ajax', () => {
+      var element;
+      setup(function () {
+        element = fixture('element');
       });
-    </script>
 
-  </body>
+      test('open first dialog', function (done) {
+        flush(function () {
+          var firstDialog = element.shadowRoot.querySelector('#firstDialog');
+          assert.equal(firstDialog.opened, true);
+          done();
+        });
+      });
+
+      test('close first dialog', function (done) {
+        element.closeFirstDialog();
+        flush(function () {
+          var firstDialog = element.shadowRoot.querySelector('#firstDialog');
+          assert.equal(firstDialog.opened, false);
+          done();
+        });
+      });
+
+      test('get favorite fruit', function () {
+        var banana = element._getFavoriteFruit('banana');
+        var apple = element._getFavoriteFruit('apple');
+        var strawberry = element._getFavoriteFruit('strawberry');
+        assert.equal(banana, '🍌');
+        assert.equal(apple, '🍎');
+        assert.equal(strawberry, '🍓');
+      });
+
+      test('validate if person is active', function () {
+        var isActive = element._isPersonActive(true);
+        assert.equal(isActive, 'active');
+      });
+
+      test('validate if person is not active', function () {
+        var isActive = element._isPersonActive(false);
+        assert.equal(isActive, '');
+      });
+
+      test('validate if mask is correct', function () {
+        var balanceWithMask = element._applyMask('$1,255.50');
+        assert.equal(balanceWithMask, '1255.50');
+      });
+
+      test('show friends when clicked', (done) => {
+        element.persons = [{
+          "isActive": true,
+          "balance": "$1,113.78",
+          "picture": "https://picsum.photos/200/486",
+          "favoriteFruit": "banana"
+        }];
+        flush(function () {
+          var btn = element.shadowRoot.querySelector('#idBtnToggleFriend0');
+          btn.click();
+          assert.equal(element.persons[0].showFriends, true);
+          done();
+        });
+      });
+    });
+  </script>
+
+</body>
+
 </html>
