@@ -24,7 +24,6 @@
   <script>
     suite('ejemplo-iron-ajax', function () {
       var element;
-      var ajax;
       var request;
       var server;
       var responseHeaders = {
@@ -32,17 +31,8 @@
           'Content-Type': 'application/json'
         }
       };
-     
-      setup(function () {
-        element = fixture('element');
-        ajax = element.shadowRoot.querySelector('#ironAjax');
-        server = sinon.fakeServer.create();
-        server.respondWith(
-          'GET',
-          /http:\/\/demo6292426.mockable.io\/persons/, [
-            200,
-            responseHeaders.json,
-            `[
+      var persons = `
+            [
                {
                   "_id": "5fd8f9fddd01a8053fa72149",
                   "index": 0,
@@ -92,7 +82,17 @@
                   "greeting": "Hello, Moon! You have 7 unread messages.",
                   "favoriteFruit": "banana"
                  }
-              ]`
+              ]`;
+
+      setup(function () {
+        element = fixture('element');
+        server = sinon.fakeServer.create();
+        server.respondWith(
+          'GET',
+          /http:\/\/demo6292426.mockable.io\/persons/, [
+            200,
+            responseHeaders.json,
+            persons
           ]
         );
       });
@@ -100,7 +100,8 @@
       teardown(function () {
         server.restore();
       });
-      //Validar que el connectedCallback se ejecutó correctamente, aquí las acciones del usuario no estan involucradas, él no da clic para abrir el dialog
+
+
       test('open first dialog when component load', function (done) {
         flush(function () {
           var firstDialog = element.shadowRoot.querySelector('#firstDialog');
@@ -109,22 +110,30 @@
         });
       });
 
-      //Validar que cuando el usuario de clic se cierre el modal y se cargue la info
-      test('close first dialog and load data', function (done) {
+      test('close first dialog and load data', function () {
+        var spy1 = sinon.spy(element, 'closeFirstDialog');
+        var spy2 = sinon.spy(element, 'loadData');
+        element.showExample();
+        assert.isTrue(spy1.called);
+        assert.isTrue(spy2.called);
+      });
+
+      test('close first dialog', function (done) {
         flush(function () {
-          var firstDialog = element.shadowRoot.querySelector("#firstDialog");
-          var button = element.shadowRoot.querySelector("#buttonShowExampleFromMixin");
-          button.click();
-          request = ajax.generateRequest();
-          server.respond();
+          element.closeFirstDialog();
+          var firstDialog = element.shadowRoot.querySelector('#firstDialog');
           assert.equal(firstDialog.opened, false);
-          expect(request.response).to.be.ok;
-          expect(request.response).to.be.an('array');
           done();
         });
       });
 
-      //Validar que los emojis de las frutas sean los correctos
+      test('load data', function () {
+        var request = element.loadData();
+        server.respond();
+        expect(request.response).to.be.ok;
+        expect(request.response).to.be.an('array');
+      })
+
       test('get favorite fruit', function () {
         var banana = element._getFavoriteFruit('banana');
         var apple = element._getFavoriteFruit('apple');
@@ -149,7 +158,17 @@
         assert.equal(balanceWithMask, '1255.50');
       });
 
-      test('show friends when clicked', (done) => {
+      test('close first and second dialogs and load data', function () {
+        var spy1 = sinon.spy(element, 'closeFirstDialog');
+        var spy2 = sinon.spy(element, 'closeSecondDialog');
+        var spy3 = sinon.spy(element, 'loadData');
+        element.showExampleFromMixin();
+        assert.isTrue(spy1.called);
+        assert.isTrue(spy2.called);
+        assert.isTrue(spy3.called);
+      });
+
+      test('show friends when clicked', function (done) {
         element.persons = [{
           "isActive": true,
           "balance": "$1,113.78",
@@ -158,11 +177,48 @@
         }];
         flush(function () {
           var btn = element.shadowRoot.querySelector('#idBtnToggleFriend0');
-          btn.click();
+          var event = {
+            model: element.$.domRepeat.modelForElement(btn)
+          };
+          element.toggleFriends(event);
           assert.equal(element.persons[0].showFriends, true);
           done();
-        });
+        })
+
       });
+
+      test('hide friends when clicked', function (done) {
+        element.persons = [{
+          "isActive": true,
+          "balance": "$1,113.78",
+          "picture": "https://picsum.photos/200/486",
+          "favoriteFruit": "banana",
+          "showFriends": false
+        }];
+        flush(function () {
+          var btn = element.shadowRoot.querySelector('#idBtnToggleFriend0');
+          element.toggleFriends({
+            model: element.$.domRepeat.modelForElement(btn)
+          });
+          assert.equal(element.persons[0].showFriends, true);
+          done();
+        })
+
+      });
+
+      // test('show friends when clicked', () => {
+      //   var event = {
+      //     model: {
+      //       person: {
+      //         showFriends: true
+      //       }
+      //     }
+      //   };
+      //   var spy1 = sinon.spy(event.model, 'set');
+      //   element.toggleFriends(event);
+      //   assert.isTrue(spy1.called);
+      //   assert.equal(element.persons[0].showFriends, true);
+      // });
     });
   </script>
 

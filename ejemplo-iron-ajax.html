@@ -1,4 +1,5 @@
 <link rel="import" href="../polymer/polymer-element.html">
+<link rel="import" href="../polymer/lib/elements/dom-repeat.html">
 <link rel="import" href="../iron-ajax/iron-ajax.html">
 <link rel="import" href="../iron-collapse/iron-collapse.html">
 <link rel="import" href="../paper-card/paper-card.html">
@@ -14,6 +15,7 @@
 <link rel="import" href="../paper-button/paper-button.html">
 <link rel="import" href="../paper-dialog/paper-dialog.html">
 <link rel="import" href="../paper-spinner/paper-spinner.html">
+
 
 
 <link rel="import" href="./mi-intento-de-dialog.html">
@@ -192,7 +194,7 @@
       </div>
     </template>
     <div class="wrapper-cards">
-      <template is="dom-repeat" items="{{persons}}" as="person">
+      <template id="domRepeat" is="dom-repeat" items="{{persons}}" as="person">
         <paper-card class$="card {{_isPersonActive(person.isActive)}}">
           <div class="card__header">
             <div class="card__header-img"><img src="{{person.picture}}" alt="Person Picture"></div>
@@ -234,7 +236,8 @@
               </paper-icon-item>
             </div>
             <div class="card__body-btn-friends">
-              <paper-button toggles id="idBtnToggleFriend{{index}}" raised on-click="toggleFriends">Friends</paper-button>
+              <paper-button toggles id="idBtnToggleFriend{{index}}" raised on-click="toggleFriends">Friends
+              </paper-button>
               <paper-button toggles raised on-click="toggleLocation">Location</paper-button>
             </div>
 
@@ -293,7 +296,7 @@
 
       loadData() {
         let ironAjax = this.shadowRoot.querySelector('#ironAjax');
-        ironAjax.generateRequest();
+        return ironAjax.generateRequest();
       }
 
       openSecondDialog() {
@@ -347,6 +350,7 @@
       }
 
       toggleLocation(e) {
+        
         e.model.set('person.showLocation', !e.model.person.showLocation);
         this.handlePersonLocation(e.model);
       }
